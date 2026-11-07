@@ -1,7 +1,13 @@
 import requests, os, subprocess
 
 # save the base URL for the API in a constant variable 
+BASE = "https://pokeapi.co/api/v2/"
 POKEMON_BASE = "https://pokeapi.co/api/v2/pokemon/"
+POKEMON_SPECIES = "https://pokeapi.co/api/v2/pokemon-species/"
+EVOLUTION_CHAIN = "https://pokeapi.co/api/v2/evolution-chain/" 
+TYPE_INFO = "https://pokeapi.co/api/v2/type/" 
+
+cache = {} 
 
 # relevant program functions
 def clearTerm(): 
@@ -9,25 +15,29 @@ def clearTerm():
 
 def pokedex(desired): # gets and displays pokemon information. this is the "core" logic
 
-    # grab information about desired pokemon with a "get" command. 
-    httpResponse = requests.get(POKEMON_BASE + desired)
+    if desired not in cache: 
+        # grab information about desired pokemon with a "get" command. 
+        httpResponse = requests.get(POKEMON_BASE + desired)
 
-    # status codes of interest: 
-    # 200 -> Success, 404 -> Not found, 429 -> Too many requests, 500+ -> Server error
+        # status codes of interest: 
+        # 200 -> Success, 404 -> Not found, 429 -> Too many requests, 500+ -> Server error
 
-    if httpResponse.status_code != 200: 
-        # signify there was an error to whoever is calling this function
-        return -1 
+        if httpResponse.status_code != 200: 
+            # signify there was an error to whoever is calling this function
+            return -1 
 
-    else: 
-        data = httpResponse.json() # grab the Pokemon's information
+        else: 
+            data = httpResponse.json() # grab the Pokemon's information
+            cache[desired] = data
+    else:
+        data = cache[desired]
 
-        name = data["name"].capitalize()
-        id = data["id"]
-        types = ", ".join([t["type"]["name"].capitalize() for t in data["types"]])
-        height = data["height"]
-        weight = data["weight"]
-
+    # categorize data as needed 
+    name = data["name"].capitalize()
+    id = data["id"]
+    types = ", ".join([t["type"]["name"].capitalize() for t in data["types"]])
+    height = data["height"]
+    weight = data["weight"]
 
     # display the pokemon's information 
     print("\n•☽────✧˖°˖☆˖°˖✧────☾• \n")
