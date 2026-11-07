@@ -52,12 +52,18 @@ def main():
 
         if pokedex(desired) == -1: 
             # logic for failed pokedex 
-            print("There was an error; please ensure you're searching for a valid Pokémon. \n") 
-            next = ((input("Would you like to try again? (y/n)")).lower()).strip()
-        else: 
-            next = ((input("Would you like to search for another pokemon? (y/n) ")).lower()).strip() 
+            print("\nThere was an error; please ensure you're searching for a valid Pokémon.") 
 
-        if next == "n": 
+        while True: 
+            # .strip() and .lower() handled cleanly in one line
+            user_choice = input("\nWould you like to search again? (y/n) ").strip().lower() 
+            
+            if user_choice in ("y", "n"): 
+                break
+            
+            print("\nYour input was malformed.")
+
+        if user_choice == "n": 
             break
 
 # run the program logic 
