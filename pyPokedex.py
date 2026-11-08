@@ -27,17 +27,24 @@ def pokedex(desired): # gets and displays pokemon information. this is the "core
             return -1 
 
         else: 
-            data = httpResponse.json() # grab the Pokemon's information
-            cache[desired] = data
+            pokemon_data = httpResponse.json() # grab the Pokemon's information
+            species_data = requests.get(pokemon_data["species"]["url"]).json() # species gives us further info 
+            evolution_data = requests.get(species_data["evolution_chain"]["url"]).json() 
+            cache[desired] = [pokemon_data, species_data, evolution_data] 
     else:
-        data = cache[desired]
+        pokemon_data = cache[desired][0] 
+        species_data = cache[desired][1] 
+        evolution_data = cache[desired][2] 
 
-    # categorize data as needed 
-    name = data["name"].capitalize()
-    id = data["id"]
-    types = ", ".join([t["type"]["name"].capitalize() for t in data["types"]])
-    height = data["height"]
-    weight = data["weight"]
+    # categorize data as needed, from pokemon_data
+    name = pokemon_data["name"].capitalize()
+    id = pokemon_data["id"]
+    types = ", ".join([t["type"]["name"].capitalize() for t in pokemon_data["types"]])
+    height = pokemon_data["height"]
+    weight = pokemon_data["weight"]
+
+    # from species_data and evolution_data
+    evolves_from = species_data["evolves_from_species"]["name"].capitalize() if species_data["evolves_from_species"] else None
 
     # display the pokemon's information 
     print("\n•☽────✧˖°˖☆˖°˖✧────☾• \n")
@@ -45,6 +52,10 @@ def pokedex(desired): # gets and displays pokemon information. this is the "core
     print(f'Name: {name}')
     print(f'ID: {id}')
     print(f'Type: {types}')
+
+    if evolves_from != None: 
+        print(f'Evolves from: {evolves_from}')
+
     print(f'Height: {height}')
     print(f'Weight: {weight}')
 
